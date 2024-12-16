@@ -15,8 +15,7 @@ app.use(cors({
 app.use(bodyParser.json());
 
 const transporter = nodemailer.createTransport({
-  host: 'ingage.sakura.ne.jp', // さくらインターネットのSMTPサーバー
-  port: 587, // SSLを使用するポート
+  host: 'gmail', // さくらインターネットのSMTPサーバー
   auth: {
     user: "info@bremen.co.jp",
     pass: "aork umuw vdkn batl", // アプリパスワードを使用推奨
