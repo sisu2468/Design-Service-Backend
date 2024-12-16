@@ -7,6 +7,11 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
+app.use(cors({
+  origin: 'https://design-service-znjc.vercel.app/order', // Replace with your frontend URL
+  methods: ['GET', 'POST'],       // Allow only specific HTTP methods
+  credentials: true               // Enable cookies if needed
+}));
 
 app.use(bodyParser.json());
 
