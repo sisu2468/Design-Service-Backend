@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.sakura.ne.jp', // さくらインターネットのSMTPサーバー
-  port: 465, // SSLを使用するポート
+  port: 587, // SSLを使用するポート
   secure: true, // trueでSSLを有効化
   auth: {
     user: "info@bremen.co.jp",
