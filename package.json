@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "google-spreadsheet": "^4.1.1",
+    "googleapis": "^136.0.0",
+    "http": "^0.0.1-security",
+    "nodemailer": "^6.9.16"
+  },
+  "name": "production",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
