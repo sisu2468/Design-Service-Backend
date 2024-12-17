@@ -68,7 +68,7 @@ module.exports = {
                   <br>
                   【　　数　　　量　　】${products.amount}
                   <br>
-                  【　　小　　　計　　】${products.subtotal}
+                  【　　小　　　計　　】${Number(products.subtotal).toLocaleString('en-US')}
                   <br>
                   --------------------------------
                   <br>

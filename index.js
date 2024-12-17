@@ -31,9 +31,13 @@ app.post("/deliver", async (req, res) => {
   const postalcode = req.body.postalcode;
   const address = req.body.address;
   const telnumber = req.body.telnumber;
-  const orderdate = req.body.orderdate;
+  const orderdate = req.body.orderdate; // Input: 2024-12-17T09:24:32.284Z
+
+  const date = new Date(orderdate);
+  const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
   const products = req.body.products;
-  const totalprice = req.body.totalprice;
+  const totalprice = Number(req.body.totalprice).toLocaleString('en-US');
   const deliverydate = req.body.deliverydate;
 
   console.log("data", req.body);
@@ -50,7 +54,7 @@ app.post("/deliver", async (req, res) => {
       postalcode,
       address,
       telnumber,
-      orderdate,
+      formattedDate,
       products,
       totalprice,
       deliverydate
