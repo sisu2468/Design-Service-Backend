@@ -11,10 +11,12 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const transporter = nodemailer.createTransport({
-  host: 'gmail', // さくらインターネットのSMTPサーバー
+  host: 'smtp.gmail.com', // Correct SMTP server for Gmail
+  port: 465, // Use 465 for secure connection, or 587 for STARTTLS
+  secure: true, // true for port 465, false for 587
   auth: {
     user: "bremen.digital.flag@gmail.com",
-    pass: "wpsq ukya xzgj erie", // アプリパスワードを使用推奨
+    pass: "wpsq ukya xzgj erie",
   },
 });
 
