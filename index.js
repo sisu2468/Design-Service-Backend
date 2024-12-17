@@ -6,11 +6,7 @@ const sendformnotification = require("./sendformnotification");
 const cors = require('cors');
 const app = express();
 
-app.use(cors({
-  origin: 'https://design-service-gilt.vercel.app/order', // Replace with your frontend URL
-  methods: ['GET', 'POST'],       // Allow only specific HTTP methods
-  credentials: true               // Enable cookies if needed
-}));
+app.use(cors());
 
 app.use(bodyParser.json());
 
