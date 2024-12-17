@@ -13,8 +13,8 @@ app.use(bodyParser.json());
 const transporter = nodemailer.createTransport({
   host: 'gmail', // さくらインターネットのSMTPサーバー
   auth: {
-    user: "info@bremen.co.jp",
-    pass: "aork umuw vdkn batl", // アプリパスワードを使用推奨
+    user: "bremen.digital.flag@gmail.com",
+    pass: "wpsq ukya xzgj erie", // アプリパスワードを使用推奨
   },
 });
 
