@@ -31,7 +31,7 @@ app.post("/deliver", async (req, res) => {
   const postalcode = req.body.postalcode;
   const address = req.body.address;
   const telnumber = req.body.telnumber;
-  const orderdate = req.body.orderdate; // Input: 2024-12-17T09:24:32.284Z
+  const orderdate = req.body.orderdate;
 
   const date = new Date(orderdate);
   const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
