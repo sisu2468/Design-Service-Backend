@@ -71,31 +71,31 @@ app.post("/deliver", async (req, res) => {
       encoding: "base64",
     }));
 
-  const generateProductHtml = (products) => {
-    return products
-      .map((product) => `
-      <div>
-        <p>商品名: ${product.flagtype}</p>
-        <p>数量: ${product.amount}</p>
-        <p>小計: ${product.subtotal}円</p>
-      </div>
-    `)
-      .join("");
-  };
+  // const generateProductHtml = (products) => {
+  //   return products
+  //     .map((product) => `
+  //     <div>
+  //       <p>商品名: ${product.flagtype}</p>
+  //       <p>数量: ${product.amount}</p>
+  //       <p>小計: ${product.subtotal}円</p>
+  //     </div>
+  //   `)
+  //     .join("");
+  // };
 
-  const mailOptions1 = {
-    from: "株式会社ブレーメン",
-    to: 'gdev48147@gmail.com',
-    subject: "ブレーメンデジタルフラッグのご注文",
-    html: `
-    <h1>ご注文内容</h1>
-    ${generateProductHtml(products)}
-  `,
-    attachments, // Attach image data
-  };
+  // const mailOptions1 = {
+  //   from: "株式会社ブレーメン",
+  //   to: 'gdev48147@gmail.com',
+  //   subject: "ブレーメンデジタルフラッグのご注文",
+  //   html: `
+  //   <h1>ご注文内容</h1>
+  //   ${generateProductHtml(products)}
+  // `,
+  //   attachments, // Attach image data
+  // };
 
-  await transporter.sendMail(mailOptions1);
-  res.status(200).send("メールを送信しました");
+  // await transporter.sendMail(mailOptions1);
+  // res.status(200).send("メールを送信しました");
 });
 
 // サーバーを開始
