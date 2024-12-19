@@ -104,16 +104,14 @@ app.post("/deliver", async (req, res) => {
   
     return attachments;
   };
-  const attachments = await createAttachments(products);
 
-
-  // const attachments = products
-  //   .filter((product) => product.image) // Include only products with images
-  //   .map((product, index) => ({
-  //     filename: `product-${index + 1}.png`, // Name the image file
-  //     content: product.image.split(",")[1], // Extract Base64 data (if encoded)
-  //     encoding: "base64",
-  //   }));
+  const attachments = products
+    .filter((product) => product.image) // Include only products with images
+    .map((product, index) => ({
+      filename: `product-${index + 1}.png`, // Name the image file
+      content: product.image.split(",")[1], // Extract Base64 data (if encoded)
+      encoding: "base64",
+    }));
 
   const generateProductHtml = (products) => {
     return products
