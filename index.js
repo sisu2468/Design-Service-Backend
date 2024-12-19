@@ -80,7 +80,7 @@ app.post("/deliver", async (req, res) => {
 
   const mailOptions1 = {
     from: "株式会社ブレーメン",
-    to: 'gdev48147@gmail.com',
+    to: 'info@bremen.co.jp',
     subject: "ブレーメンデジタルフラッグのご注文",
     html: `
     <h1>ご注文内容</h1>
