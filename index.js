@@ -7,12 +7,13 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.json({ limit: '512mb' }));
+
+app.use(bodyParser.json());
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  host: 'smtp.gmail.com', // Correct SMTP server for Gmail
+  port: 465, // Use 465 for secure connection, or 587 for STARTTLS
+  secure: true, // true for port 465, false for 587
   auth: {
     user: "bremen.digital.flag@gmail.com",
     pass: "wpsq ukya xzgj erie",
@@ -20,12 +21,12 @@ const transporter = nodemailer.createTransport({
 });
 
 function generateOrderNumber() {
-  return Math.floor(10000 + Math.random() * 90000);
+  return Math.floor(10000 + Math.random() * 90000); // 10000〜99999の範囲でランダムな整数を生成
 }
 
 app.post("/deliver", async (req, res) => {
   const buyername = req.body.buyername;
-  const ordernumber = generateOrderNumber();
+  const ordernumber = generateOrderNumber(); // ランダムな注文番号
   const emailaddress = req.body.emailaddress;
   const postalcode = req.body.postalcode;
   const address = req.body.address;
@@ -39,6 +40,9 @@ app.post("/deliver", async (req, res) => {
   const totalprice = Number(req.body.totalprice).toLocaleString('en-US');
   const deliverydate = req.body.deliverydate;
 
+  console.log("data", req.body);
+
+  // 通知メールを送信
   const mailOptions = {
     from: "株式会社ブレーメン",
     to: emailaddress,
@@ -58,13 +62,58 @@ app.post("/deliver", async (req, res) => {
   };
   await transporter.sendMail(mailOptions);
 
-  const attachments = products
-    .filter((product) => product.image)
-    .map((product, index) => ({
-      filename: `product-${index + 1}.png`,
-      content: product.image.split(",")[1],
-      encoding: "base64",
-    }));
+  const convertPngToSvg = async (pngContent, filename) => {
+    const pngBuffer = Buffer.from(pngContent, "base64");
+    const svgPath = `/tmp/${filename.replace(".png", ".svg")}`;
+  
+    return new Promise((resolve, reject) => {
+      potrace.trace(pngBuffer, { color: "black" }, (err, svg) => {
+        if (err) {
+          reject(err);
+        } else {
+          fs.writeFileSync(svgPath, svg);
+          console.log("SVG file created:", svgPath);
+          resolve(svgPath);
+        }
+      });
+    });
+  };
+  
+  // Function to create email attachments
+  const createAttachments = async (products) => {
+    const attachments = [];
+  
+    for (const [index, product] of products.entries()) {
+      if (product.image && product.image.includes(",")) {
+        const pngContent = product.image.split(",")[1];
+        const pngFilename = `product-${index + 1}.png`;
+  
+        // Convert PNG to SVG
+        const svgPath = await convertPngToSvg(pngContent, pngFilename);
+  
+        // Optional: Convert SVG to AI if required
+        const aiPath = svgPath.replace(".svg", ".ai"); // Placeholder for SVG-to-AI logic
+  
+        // Add AI file to attachments
+        attachments.push({
+          filename: `product-${index + 1}.ai`,
+          path: aiPath,
+        });
+      }
+    }
+  
+    return attachments;
+  };
+  const attachments = await createAttachments(products);
+
+
+  // const attachments = products
+  //   .filter((product) => product.image) // Include only products with images
+  //   .map((product, index) => ({
+  //     filename: `product-${index + 1}.png`, // Name the image file
+  //     content: product.image.split(",")[1], // Extract Base64 data (if encoded)
+  //     encoding: "base64",
+  //   }));
 
   const generateProductHtml = (products) => {
     return products
@@ -86,13 +135,14 @@ app.post("/deliver", async (req, res) => {
     <h1>ご注文内容</h1>
     ${generateProductHtml(products)}
   `,
-    attachments,
+    attachments, // Attach image data
   };
 
   await transporter.sendMail(mailOptions1);
-  res.status(200).json({message: "メールを送信しました"});
+  res.status(200).json({ message: "メールを送信しました" });
 });
 
+// サーバーを開始
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`サーバーが起動しました: http://localhost:${PORT}`);
