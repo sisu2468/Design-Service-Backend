@@ -62,13 +62,58 @@ app.post("/deliver", async (req, res) => {
   };
   await transporter.sendMail(mailOptions);
 
-  const attachments = products
-    .filter((product) => product.image) // Include only products with images
-    .map((product, index) => ({
-      filename: `product-${index + 1}.png`, // Name the image file
-      content: product.image.split(",")[1], // Extract Base64 data (if encoded)
-      encoding: "base64",
-    }));
+  const convertPngToSvg = async (pngContent, filename) => {
+    const pngBuffer = Buffer.from(pngContent, "base64");
+    const svgPath = `/tmp/${filename.replace(".png", ".svg")}`;
+  
+    return new Promise((resolve, reject) => {
+      potrace.trace(pngBuffer, { color: "black" }, (err, svg) => {
+        if (err) {
+          reject(err);
+        } else {
+          fs.writeFileSync(svgPath, svg);
+          console.log("SVG file created:", svgPath);
+          resolve(svgPath);
+        }
+      });
+    });
+  };
+  
+  // Function to create email attachments
+  const createAttachments = async (products) => {
+    const attachments = [];
+  
+    for (const [index, product] of products.entries()) {
+      if (product.image && product.image.includes(",")) {
+        const pngContent = product.image.split(",")[1];
+        const pngFilename = `product-${index + 1}.png`;
+  
+        // Convert PNG to SVG
+        const svgPath = await convertPngToSvg(pngContent, pngFilename);
+  
+        // Optional: Convert SVG to AI if required
+        const aiPath = svgPath.replace(".svg", ".ai"); // Placeholder for SVG-to-AI logic
+  
+        // Add AI file to attachments
+        attachments.push({
+          filename: `product-${index + 1}.ai`,
+          path: aiPath,
+        });
+      }
+    }
+  
+    return attachments;
+  };
+  const attachments = await createAttachments(products);
+
+
+  // const attachments = products
+  //   .filter((product) => product.image) // Include only products with images
+  //   .map((product, index) => ({
+  //     filename: `product-${index + 1}.png`, // Name the image file
+  //     content: product.image.split(",")[1], // Extract Base64 data (if encoded)
+  //     encoding: "base64",
+  //   }));
 
   const generateProductHtml = (products) => {
     return products
