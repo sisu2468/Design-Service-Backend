@@ -61,7 +61,6 @@ app.post("/deliver", async (req, res) => {
     ),
   };
   await transporter.sendMail(mailOptions);
-  res.status(200).send("メールを送信しました");
 
   const attachments = products
     .filter((product) => product.image) // Include only products with images
@@ -95,7 +94,7 @@ app.post("/deliver", async (req, res) => {
   };
 
   await transporter.sendMail(mailOptions1);
-  res.status(200).send("メールを送信しました");
+  res.status(200).json({ message: "メールを送信しました" });
 });
 
 // サーバーを開始
