@@ -11,48 +11,6 @@ const potrace = require("potrace");
 app.use(cors());
 app.use(bodyParser.json({ limit: '512mb' }));
 
-const convertPngToSvg = async (pngContent, filename) => {
-  const pngBuffer = Buffer.from(pngContent, "base64");
-  const svgPath = `/tmp/${filename.replace(".png", ".svg")}`;
-
-  return new Promise((resolve, reject) => {
-    potrace.trace(pngBuffer, { color: "black" }, (err, svg) => {
-      if (err) {
-        reject(err);
-      } else {
-        fs.writeFileSync(svgPath, svg);
-        console.log("SVG file created:", svgPath);
-        resolve(svgPath);
-      }
-    });
-  });
-};
-
-const createAttachments = async (products) => {
-  const attachments = [];
-
-  for (const [index, product] of products.entries()) {
-    if (product.image && product.image.includes(",")) {
-      const pngContent = product.image.split(",")[1];
-      const pngFilename = `product-${index + 1}.png`;
-
-      // Convert PNG to SVG
-      const svgPath = await convertPngToSvg(pngContent, pngFilename);
-
-      // Optional: Convert SVG to AI if required
-      const aiPath = svgPath.replace(".svg", ".ai"); // Placeholder for SVG-to-AI logic
-
-      // Add AI file to attachments
-      attachments.push({
-        filename: `product-${index + 1}.ai`,
-        path: aiPath,
-      });
-    }
-  }
-
-  return attachments;
-};
-
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -109,7 +67,49 @@ app.post("/deliver", async (req, res) => {
   //     content: product.image.split(",")[1],
   //     encoding: "base64",
   //   }));
-  
+
+  const convertPngToSvg = async (pngContent, filename) => {
+    const pngBuffer = Buffer.from(pngContent, "base64");
+    const svgPath = `/tmp/${filename.replace(".png", ".svg")}`;
+
+    return new Promise((resolve, reject) => {
+      potrace.trace(pngBuffer, { color: "black" }, (err, svg) => {
+        if (err) {
+          reject(err);
+        } else {
+          fs.writeFileSync(svgPath, svg);
+          console.log("SVG file created:", svgPath);
+          resolve(svgPath);
+        }
+      });
+    });
+  };
+
+  const createAttachments = async (products) => {
+    const attachments = [];
+
+    for (const [index, product] of products.entries()) {
+      if (product.image && product.image.includes(",")) {
+        const pngContent = product.image.split(",")[1];
+        const pngFilename = `product-${index + 1}.png`;
+
+        // Convert PNG to SVG
+        const svgPath = await convertPngToSvg(pngContent, pngFilename);
+
+        // Optional: Convert SVG to AI if required
+        const aiPath = svgPath.replace(".svg", ".ai"); // Placeholder for SVG-to-AI logic
+
+        // Add AI file to attachments
+        attachments.push({
+          filename: `product-${index + 1}.ai`,
+          path: aiPath,
+        });
+      }
+    }
+
+    return attachments;
+  };
+
   const attachments = await createAttachments(products);
 
   const generateProductHtml = (products) => {
@@ -118,7 +118,7 @@ app.post("/deliver", async (req, res) => {
       <div>
         <p>商品名: ${product.flagtype}</p>
         <p>数量: ${product.amount}</p>
-        <p>小計: ${product.subtotal}円</p>
+        <p>小計: ${Number(product.subtotal).toLocaleString('en-US')}円</p>
       </div>
     `)
       .join("");
@@ -136,7 +136,7 @@ app.post("/deliver", async (req, res) => {
   };
 
   await transporter.sendMail(mailOptions1);
-  res.status(200).json({message: "メールを送信しました"});
+  res.status(200).json({ message: "メールを送信しました" });
 });
 
 const PORT = process.env.PORT || 3000;
