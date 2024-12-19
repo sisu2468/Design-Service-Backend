@@ -5,9 +5,53 @@ const axios = require("axios");
 const sendformnotification = require("./sendformnotification");
 const cors = require('cors');
 const app = express();
+const fs = require("fs");
+const potrace = require("potrace");
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '512mb' }));
+
+const convertPngToSvg = async (pngContent, filename) => {
+  const pngBuffer = Buffer.from(pngContent, "base64");
+  const svgPath = `/tmp/${filename.replace(".png", ".svg")}`;
+
+  return new Promise((resolve, reject) => {
+    potrace.trace(pngBuffer, { color: "black" }, (err, svg) => {
+      if (err) {
+        reject(err);
+      } else {
+        fs.writeFileSync(svgPath, svg);
+        console.log("SVG file created:", svgPath);
+        resolve(svgPath);
+      }
+    });
+  });
+};
+
+const createAttachments = async (products) => {
+  const attachments = [];
+
+  for (const [index, product] of products.entries()) {
+    if (product.image && product.image.includes(",")) {
+      const pngContent = product.image.split(",")[1];
+      const pngFilename = `product-${index + 1}.png`;
+
+      // Convert PNG to SVG
+      const svgPath = await convertPngToSvg(pngContent, pngFilename);
+
+      // Optional: Convert SVG to AI if required
+      const aiPath = svgPath.replace(".svg", ".ai"); // Placeholder for SVG-to-AI logic
+
+      // Add AI file to attachments
+      attachments.push({
+        filename: `product-${index + 1}.ai`,
+        path: aiPath,
+      });
+    }
+  }
+
+  return attachments;
+};
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -58,13 +102,15 @@ app.post("/deliver", async (req, res) => {
   };
   await transporter.sendMail(mailOptions);
 
-  const attachments = products
-    .filter((product) => product.image)
-    .map((product, index) => ({
-      filename: `product-${index + 1}.png`,
-      content: product.image.split(",")[1],
-      encoding: "base64",
-    }));
+  // const attachments = products
+  //   .filter((product) => product.image)
+  //   .map((product, index) => ({
+  //     filename: `product-${index + 1}.png`,
+  //     content: product.image.split(",")[1],
+  //     encoding: "base64",
+  //   }));
+  
+  const attachments = await createAttachments(products);
 
   const generateProductHtml = (products) => {
     return products
