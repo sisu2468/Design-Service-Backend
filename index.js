@@ -1,9 +1,9 @@
 const express = require("express");
+const cors = require('cors');
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
-const axios = require("axios");
 const sendformnotification = require("./sendformnotification");
-const cors = require('cors');
+const fs = require('fs');
 const app = express();
 
 app.use(cors());
@@ -60,11 +60,14 @@ app.post("/deliver", async (req, res) => {
 
   const attachments = products
     .filter((product) => product.image)
-    .map((product, index) => ({
-      filename: `product-${index + 1}.png`,
-      content: product.image.split(",")[1],
-      encoding: "base64",
-    }));
+    .map((product, index) => {
+      const buffer = Buffer.from(product.image.split(",")[1], 'base64');
+      return {
+        filename: `product-${index + 1}.png`,
+        content: product.image.split(",")[1],
+        encoding: "base64",
+      }
+    });
 
   const generateProductHtml = (products) => {
     return products
@@ -90,7 +93,7 @@ app.post("/deliver", async (req, res) => {
   };
 
   await transporter.sendMail(mailOptions1);
-  res.status(200).json({message: "メールを送信しました"});
+  res.status(200).json({ message: "メールを送信しました" });
 });
 
 const PORT = process.env.PORT || 3000;
