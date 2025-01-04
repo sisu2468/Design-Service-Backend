@@ -62,9 +62,11 @@ app.post("/deliver", async (req, res) => {
     .filter((product) => product.image)
     .map((product, index) => {
       const buffer = Buffer.from(product.image.split(",")[1], 'base64');
+      console.log(buffer);
+      
       return {
-        filename: `product-${index + 1}.png`,
-        content: product.image.split(",")[1],
+        filename: `product-${index + 1}.psd`,
+        content: buffer,
         encoding: "base64",
       }
     });
