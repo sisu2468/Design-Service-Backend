@@ -17,7 +17,9 @@ module.exports = {
     <body>
         <div class="content">
             <h1 class="clinic">${buyername} 様</h1>
-            <p class="phase1">この度はブレーメンデジタルフラッグのご注文いただき、誠にありがとございます。</p>
+            <p class="">※このメールは送信専用です。このメールに返信いただいても対応できませんので、ご了承ください。</p>
+            <p class="phase1">※お問い合わせは「info@bremen.co.jp」までお願いいたします。</p>
+            <p class="">この度はブレーメンデジタルフラッグのご注文いただき、誠にありがとございます。</p>
             <p class="phase1">本日、以下のご注文を承りましたので、ご確認をお願い申し上げます。</p>
             <p>
                 【　受　注　番　号　】${ordernumber}
