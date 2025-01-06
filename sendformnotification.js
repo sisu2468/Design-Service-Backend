@@ -1,6 +1,6 @@
 module.exports = {
-  sendformnotification: (buyername, ordernumber, emailaddress, postalcode, address, telnumber, orderdate, products, totalprice, deliverydate) => {
-    return `
+    sendformnotification: (buyername, ordernumber, emailaddress, postalcode, address, telnumber, orderdate, products, totalprice, deliverydate, shippingInfo) => {
+        return `
         <!DOCTYPE html>
 <html>
     <head>
@@ -49,23 +49,24 @@ module.exports = {
                 <br>
                 ================================
                 <br>
-                【　お　　名　　前　】${buyername}
+                【　お　　名　　前　】${shippingInfo ? shippingInfo.name : buyername}
                 <br>
-                【　郵　便　番　号　】${postalcode}
+                【　郵　便　番　号　】${shippingInfo ? shippingInfo.postalNumber : postalcode}
                 <br>
-                【　ご　　住　　所　】${address}
+                【　ご　　住　　所　】${shippingInfo ? shippingInfo.address : address}
                 <br>
-                【　電　話　番　号　】${telnumber}
+                【　電　話　番　号　】${shippingInfo ? shippingInfo.phoneNumber : telnumber}
                 <br>
                 ================================
                 <br>
             </p>
+
             <p>
                 ▼商品詳細
                 <br>
                 ================================
                 <br>
-                ${products.map ((products, index) => `
+                ${products.map((products, index) => `
                   【　商　　品　　名　】${products.flagtype}
                   <br>
                   【　　数　　　量　　】${products.amount}
@@ -148,5 +149,5 @@ module.exports = {
     </body>
 </html>
     `
-  }
+    }
 }

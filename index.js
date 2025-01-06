@@ -45,6 +45,7 @@ app.post("/deliver", async (req, res) => {
   const products = req.body.products;
   const totalprice = Number(req.body.totalprice).toLocaleString('en-US');
   const deliverydate = req.body.deliverydate;
+  const shippingInfo = req.body.shippingInfo;
 
   const mailOptions = {
     from: "株式会社ブレーメン",
@@ -60,7 +61,8 @@ app.post("/deliver", async (req, res) => {
       formattedDate,
       products,
       totalprice,
-      deliverydate
+      deliverydate,
+      shippingInfo ? shippingInfo : null
     ),
   };
   sendEmail(mailOptions);
@@ -75,19 +77,6 @@ app.post("/deliver", async (req, res) => {
         encoding: "base64",
       }
     });
-  console.log(attachments);
-  
-  const generateProductHtml = (products) => {
-    return products
-      .map((product) => `
-      <div>
-        <p>商品名: ${product.flagtype}</p>
-        <p>数量: ${product.amount}</p>
-        <p>小計: ${Number(product.subtotal).toLocaleString('en-US')}円</p>
-      </div>
-    `)
-      .join("");
-  };
 
   const mailOptions1 = {
     from: "株式会社ブレーメン",
