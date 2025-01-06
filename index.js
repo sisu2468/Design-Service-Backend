@@ -3,7 +3,6 @@ const cors = require('cors');
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const sendformnotification = require("./sendformnotification");
-const fs = require('fs');
 const app = express();
 
 app.use(cors());
@@ -15,9 +14,17 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: "bremen.digital.flag@gmail.com",
-    pass: "wpsq ukya xzgj erie",
+    pass: "yuii haue jeps fcao",
   },
 });
+const sendEmail = async (mailOptions) => {
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent successfully!");
+  } catch (error) {
+    console.error("Failed to send email:", error.message);
+  }
+};
 
 function generateOrderNumber() {
   return Math.floor(10000 + Math.random() * 90000);
@@ -56,21 +63,20 @@ app.post("/deliver", async (req, res) => {
       deliverydate
     ),
   };
-  await transporter.sendMail(mailOptions);
+  sendEmail(mailOptions);
 
   const attachments = products
     .filter((product) => product.image)
     .map((product, index) => {
       const buffer = Buffer.from(product.image.split(",")[1], 'base64');
-      console.log(buffer);
-      
       return {
         filename: `product-${index + 1}.psd`,
         content: buffer,
         encoding: "base64",
       }
     });
-
+  console.log(attachments);
+  
   const generateProductHtml = (products) => {
     return products
       .map((product) => `
@@ -93,8 +99,7 @@ app.post("/deliver", async (req, res) => {
   `,
     attachments,
   };
-
-  await transporter.sendMail(mailOptions1);
+  sendEmail(mailOptions1)
   res.status(200).json({ message: "メールを送信しました" });
 });
 
