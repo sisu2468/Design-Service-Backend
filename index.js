@@ -93,10 +93,18 @@ app.post("/deliver", async (req, res) => {
     from: "株式会社ブレーメン",
     to: 'info@bremen.co.jp',
     subject: "ブレーメンデジタルフラッグのご注文",
-    html: `
-    <h1>ご注文内容</h1>
-    ${generateProductHtml(products)}
-  `,
+    html: sendformnotification.sendformnotification(
+      buyername,
+      ordernumber,
+      emailaddress,
+      postalcode,
+      address,
+      telnumber,
+      formattedDate,
+      products,
+      totalprice,
+      deliverydate
+    ),
     attachments,
   };
   sendEmail(mailOptions1)
